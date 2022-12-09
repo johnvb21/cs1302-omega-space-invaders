@@ -1,5 +1,10 @@
 package cs1302.omega;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.layout.StackPane;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
@@ -21,18 +26,32 @@ import javafx.animation.AnimationTimer;
 import java.util.LinkedList;
 import javafx.geometry.Bounds;
 import java.util.Random;
-
+import javafx.scene.layout.StackPane;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 /**
  * REPLACE WITH NON-SHOUTING DESCRIPTION OF YOUR APP.
  */
 public class OmegaApp extends Application {
-    private Pane root = new Pane();
+    Pane root = new Pane();
     Rectangle r;
     int laserStatus = 0;
-    Image game_end = new Image("file:resources/sprites/661.jpg", 1000, 1000, false, false);
-    ImageView game_over = new ImageView(game_end);
-
-
+    Rectangle barrier = new Rectangle(200, 50, Color.GRAY);
+    Rectangle barrier1 = new Rectangle(200, 50, Color.GRAY);
+    Text scoreDisplay = new Text(100, 200, "Score: 0");
+    int level = 0;
+    int count = 0;
+    int score = 0;
+    int counter = 0;
+    int counterRight = 0;
+    int levelTimer = 0;
+    int barrierCount = 0;
+    int barrier1Count = 0;
+    int timeCount = 0;
+    Stage stage;
+    Pane game_over = new Pane();
+    Text gameOver = new Text(250, 400, "GAME OVER: PLAY AGAIN?");
+    Button playAgain = new Button("Play Again");
     Image player_icon = new Image("file:resources/sprites/space-invaders.png");
     Image i_enemy1 = new Image("file:resources/sprites/space-ship.png");
     LinkedList<Ship> enemySprites = new LinkedList<Ship>();
@@ -47,30 +66,53 @@ public class OmegaApp extends Application {
 
 
     public OmegaApp() {
-        root.setPrefSize(1000, 1000);
-        root.getChildren().add(player);
+//        root.setPrefSize(1000, 1000);
+
 
 
 
     }
 
-    int count = 0;
+
     /** {@inheritDoc} */
     @Override
 
 
-    public void start(Stage stage) {
+    public void start(Stage primaryStage) {
+        startGame(primaryStage);
+
+    } // start
+
+    public void startGame(Stage stage) {
+        this.stage = stage;
+        root = new Pane();
+        root.setPrefSize(1000, 1000);
         Scene scene = new Scene(root, 1000, 1000);
         stage.setScene(scene);
         stage.setWidth(1000);
         stage.setHeight(1000);
+        game_over.setStyle("-fx-background-color: black;");
+        gameOver.setFont(new Font(35));
+        gameOver.setFill(Color.PURPLE);
         root.setStyle("-fx-background-color: black;");
+        root.getChildren().add(player);
         newLevel();
+        root.getChildren().add(scoreDisplay);
+        scoreDisplay.setFont(new Font(25));
+        scoreDisplay.setFill(Color.PURPLE);
         timer.start();
+        root.getChildren().add(barrier);
+        barrier.setX(700);
+        barrier.setY(450);
+        root.getChildren().add(barrier1);
+        barrier1.setX(200);
+        barrier1.setY(450);
+
         scene.setOnKeyPressed(p -> {
             switch (p.getCode()) {
             case SPACE:
-                if (count > 60 || count == 0) {
+                laserStatus = 1;
+                if (count > 10 || count == 0) {
                     count = 0;
                     fire(player, player.laserBeam);
 
@@ -85,36 +127,97 @@ public class OmegaApp extends Application {
 
             } // switch
         });
+        playAgain.setOnAction(restartGame);
         stage.show();
-
     } // start
-    int counter = 0;
+        EventHandler<ActionEvent> restartGame = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e)
+                    {
+                        stage.close();
+
+                    }
+            };
+//    playAgain.setOnAction(restartGame);
+
+
     AnimationTimer timer = new AnimationTimer() {
             public void handle(long now) {
                 update();
 
             } // handle
         }; // timer
-    int timeCount = 0;
+
+
+
+
+
+
     private void update() {
-        if (player.dead == true) {
-            timer.stop();
-            root.getChildren().clear();
-            root.getChildren().add(game_over);
+
+        if (barrierCount == 100) {
+            root.getChildren().remove(barrier);
         } // if
+        if (barrier1Count == 100) {
+            root.getChildren().remove(barrier1);
+        } // if
+        if (player.dead == true) {
+            root.getChildren().clear();
+            timer.stop();
+            playAgain.setTranslateX(400);
+            playAgain.setTranslateY(500);
+            playAgain.setPrefWidth(200);
+            playAgain.setPrefHeight(100);
+            Pane over = new Pane();
+            over.setPrefSize(1000, 1000);
+            over.getChildren().addAll(game_over, gameOver, playAgain);
+            Scene end = new Scene(over, 1000, 1000);
+            stage.setScene(end);
+            stage.setWidth(1000);
+            stage.setHeight(1000);
+        } // if
+        if (enemySprites.size() == 0) {
+            level += 1;
+
+            newLevel();
+            } // if
+
+
         for (int i = 0; i < enemySprites.size(); i++) {
-            if (counter < 400) {
-                enemySprites.get(i).setX(enemySprites.get(i).getX() - 5);
+            // checks enemy intersection with barrier
+            if (enemySprites.get(i).laserBeam.getBoundsInParent().
+            intersects(barrier.getBoundsInParent())) {
+                if (barrierCount < 100) {
+                    enemySprites.get(i).laserBeam.setX(1000);
+                } // if
+                barrierCount += 1;
+                root.getChildren().remove(enemySprites.get(i).laserBeam);
+            } // if
+            // checks enemy intersection with barrier1
+            if (enemySprites.get(i).laserBeam.getBoundsInParent().
+            intersects(barrier1.getBoundsInParent())) {
+                barrier1Count += 1;
+                if (barrier1Count < 100) {
+                    enemySprites.get(i).laserBeam.setX(1000);
+                } // if
+                root.getChildren().remove(enemySprites.get(i).laserBeam);
+            } // if
+
+            if (counter < 200) {
+                enemySprites.get(i).setX(enemySprites.get(i).getX() - 2);
                 counter += 1;
-            } else if (counter >= 400) {
-                enemySprites.get(i).setX(enemySprites.get(i).getX() + 5);
-                counter += 1;
-                if (counter > 800) {
+                if (counter == 200) {
+                    counterRight = 0;
+                } // if
+            } // if
+            if (counterRight < 200 && counter == 200) {
+                enemySprites.get(i).setX(enemySprites.get(i).getX() + 2);
+                counterRight += 1;
+                if (counterRight == 200) {
                     counter = 0;
                 } // if
-
-            } // else if
-            if (timeCount < 400) {
+            } // if
+            // timeCount is responsible for timing the rate of enemy fire
+            if (timeCount < 600) {
                 timeCount += 1;
             } else {
                 timeCount = 0;
@@ -125,19 +228,25 @@ public class OmegaApp extends Application {
             if (laserStatus == 1) {
                 if (player.laserBeam.getBoundsInParent().
                 intersects(enemySprites.get(i).getBoundsInParent())) {
+                    root.getChildren().remove(player.laserBeam);
                     enemySprites.get(i).dead = true;
+                    player.laserBeam.setX(1000);
+                    laserStatus = 0;
+                    score += 2;
+
                     root.getChildren().remove(enemySprites.get(i));
                     root.getChildren().remove(enemySprites.get(i).laserBeam);
                     enemySprites.remove(i);
-
+                    scoreDisplay.setText("Score: "+ score);
                 } // if
+
             } // if
         } // for
 
 
         for (int h = 0; h < enemySprites.size(); h++) {
             try {
-                enemySprites.get(h).laserBeam.setY(enemySprites.get(h).laserBeam.getY() + 30);
+                enemySprites.get(h).laserBeam.setY(enemySprites.get(h).laserBeam.getY() + 20);
                 if (enemySprites.get(h).laserBeam.getBoundsInParent().
                 intersects(player.getBoundsInParent())) {
                     player.dead = true;
@@ -148,9 +257,9 @@ public class OmegaApp extends Application {
             } // catch
         } // for
 
-
+// if lasers are on, the laser position will be updated per frame
         if (laserStatus == 1) {
-            player.laserBeam.setY(player.laserBeam.getY() - 30);
+            player.laserBeam.setY(player.laserBeam.getY() - 55);
             count += 2;
         } // if
     } // update
@@ -168,13 +277,18 @@ public class OmegaApp extends Application {
     } // enemy Fire
 
     public void newLevel() {
-        int x = 800;
+//        int x = 800;
 
-        for (int i = 0; i < 8; i++) {
-            Ship s = new Ship(x, 100, 50, 50, i_enemy1);
-            enemySprites.add(s);
-            root.getChildren().add(s);
-            x -= 70;
+        int y = 100;
+        for (int u = 0; u < level; u++) {
+            int x = 800;
+            for (int i = 0; i < 8; i++) {
+                Ship s = new Ship(x, y, 50, 50, i_enemy1);
+                enemySprites.add(s);
+                root.getChildren().add(s);
+                x -= 70;
+            } // for
+            y += 70;
         } // for
 
 
@@ -194,11 +308,11 @@ public class OmegaApp extends Application {
 
         } // Ship
         void moveRight() {
-            setX(getX() + 12);
+            setX(getX() + 20);
 
         } // moveRight
         void moveLeft() {
-            setX(getX() - 12);
+            setX(getX() - 20);
 
         } // moveLeft
         void moveUp() {
@@ -211,7 +325,8 @@ public class OmegaApp extends Application {
     } // Ship
 
     public void fire(Ship s, Rectangle r) {
-        laserStatus = 1;
+        // laserStatus indicates if lasers are turned on for player
+
         try {
             root.getChildren().remove(r);
         } catch (Exception e) {
