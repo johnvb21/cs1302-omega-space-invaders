@@ -5,14 +5,14 @@ authored by members of your project team.
 
 ## Assets
 
-* The Palm of Alpha Tau Omega
-  - `resources/readme-banner.png`
-  - Alpha Tau Omega. 1880. "The Palm of Alpha Tau Omega"
-  - https://flic.kr/p/oeYPsZ
-  - Public Domain
+* Space Invaders Icon
+  - 'resources/sprites/space-invaders.png'
+  - FlatIcon.com, 2022
+  - https://www.flaticon.com/free-icons/space-invaders
+  - Creative Commons
 
-* Idle Cat
-  - `resources/sprites/cat_idle.gif`
-  - dogchicken. 2012. "Cat Fighter Sprite Sheet"
-  - https://opengameart.org/content/cat-fighter-sprite-sheet
-  - CC-BY 3.0
+* Space Ship Icon (enemy)
+  - 'resources/sprites/space-ship.png'
+  - Freepik, 2022
+  - https://www.flaticon.com/free-icons/space-ship
+  - Creative Commons
