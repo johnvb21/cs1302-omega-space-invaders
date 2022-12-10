@@ -1,0 +1,11 @@
+Loading site defaults (default.el)...done
+For information about GNU Emacs and the GNU system, type C-h C-a.
+Saving file /home/myid/jrv06496/cs1302-unix/cs1302-omega/src/main/java/cs1302/omega/OmegaApp.java...
+Wrote /home/myid/jrv06496/cs1302-unix/cs1302-omega/src/main/java/cs1302/omega/OmegaApp.java
+user-error: No mark set in this buffer
+C-c C-x C-s is undefined
+user-error: No mark set in this buffer
+Quit [3 times]
+command-execute: Buffer is read-only: #<buffer *Messages*> [3 times]
+Save file /home/myid/jrv06496/cs1302-unix/cs1302-omega/src/main/java/cs1302/omega/OmegaApp.java? (y, n, !, ., q, C-r, C-f, d or C-h) 
+Save file /home/myid/jrv06496/cs1302-unix/cs1302-omega/src/main/java/cs1302/omega/OmegaApp.java? (y, n, !, ., q, C-r, C-f, d or C-h) n
